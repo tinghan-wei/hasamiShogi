@@ -151,6 +151,23 @@ class HasamiShogi:
         for (dr, dc) in dead:
             self.board[dr][dc] = EMPTY
         return len(dead)
+    
+    def generate_legal_moves(self, me):
+        """
+        Generate all legal sliding moves for player 'me'.
+        Returns a list of tuples (r1, c1, r2, c2).
+        """
+        moves = []
+        for r in range(BOARD_SIZE):
+            for c in range(BOARD_SIZE):
+                if self.board[r][c] == me:
+                    for dr, dc in DIRECTIONS:
+                        nr, nc = r + dr, c + dc
+                        while self.in_bounds(nr, nc) and self.board[nr][nc] == EMPTY:
+                            if self.is_legal_move(r, c, nr, nc, me):
+                                moves.append((r, c, nr, nc))
+                            nr += dr; nc += dc
+        return moves
 
     def apply_move(self, r1, c1, r2, c2, me):
         opp = BLACK if me == WHITE else WHITE
@@ -163,9 +180,9 @@ class HasamiShogi:
         total = 0
         for dr, dc in DIRECTIONS:
             total += self.capture_from(r2, c2, dr, dc, me, opp)
-            print(self.serialize())
+            #print(self.serialize())
         total += self.remove_dead_groups(opp)
-        print(self.serialize())
+        #print(self.serialize())
         self.captures[me] += total
         
         # update pending_leader in case of leading 3 captures

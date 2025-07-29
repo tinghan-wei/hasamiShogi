@@ -77,7 +77,7 @@ def parse_moves(s):
 
 def run_arena(black_arg, white_arg, max_moves=500):
     global arena
-    arena = hasamiShogi()
+    arena = hasamiShogi.HasamiShogi()
     engines = {
         hasamiShogi.BLACK: make_engine(black_arg, hasamiShogi.BLACK),
         hasamiShogi.WHITE: make_engine(white_arg, hasamiShogi.WHITE)

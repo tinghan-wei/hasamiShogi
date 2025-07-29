@@ -97,5 +97,25 @@ class TestHasamiShogi(unittest.TestCase):
         player = game.is_game_over()
         self.assertEqual(player, hasamiShogi.BLACK)
 
+    def test_real(self):
+        board = [
+        ".BB..BBB.",
+        "W...B....",
+        ".........",
+        ".........",
+        ".........",
+        "B........",
+        "W........",
+        "........W",
+        "..WWWWWW."]
+        game.set_board(board)
+        game.captures[hasamiShogi.WHITE] = 2
+        game.apply_move(1,0,4,0, hasamiShogi.WHITE)
+        player = game.is_game_over()
+        self.assertEqual(player, None)
+        game.apply_move(0,1,1,1, hasamiShogi.BLACK)
+        player = game.is_game_over()
+        self.assertEqual(player, hasamiShogi.WHITE)
+
 if __name__ == '__main__':
     unittest.main()
