@@ -1,6 +1,35 @@
 #!/usr/bin/env python3
 import subprocess, sys
 import hasamiShogi
+import pickle
+import pygame
+import time
+
+CELL_SIZE = 60
+DELAY = 0.3     # seconds
+
+def init_display(board_size):
+    pygame.init()
+    size = hasamiShogi.BOARD_SIZE * CELL_SIZE
+    screen = pygame.display.set_mode((size, size))
+    pygame.display.set_caption("Hasami Shogi Match")
+    return screen
+
+def draw_board(screen, board):
+    screen.fill((200,200,200))
+    for r in range(len(board)):
+        for c in range(len(board)):
+            x, y = c*CELL_SIZE, r*CELL_SIZE
+            rect = pygame.Rect(x,y,CELL_SIZE,CELL_SIZE)
+            pygame.draw.rect(screen, (255,255,255), rect)
+            pygame.draw.rect(screen, (0,0,0), rect, 1)
+            p = board[r][c]
+            if p == hasamiShogi.BLACK:
+                pygame.draw.circle(screen, (0,0,0), rect.center, CELL_SIZE//2-5)
+            elif p == hasamiShogi.WHITE:
+                pygame.draw.circle(screen, (255,255,255), rect.center, CELL_SIZE//2-5)
+                pygame.draw.circle(screen, (0,0,0), rect.center, CELL_SIZE//2-5, 2)
+    pygame.display.flip()
 
 class Engine:
     def send(self, line): pass
@@ -78,6 +107,8 @@ def parse_moves(s):
 def run_arena(black_arg, white_arg, max_moves=500):
     global arena
     arena = hasamiShogi.HasamiShogi()
+    screen = init_display(hasamiShogi.BOARD_SIZE)
+
     engines = {
         hasamiShogi.BLACK: make_engine(black_arg, hasamiShogi.BLACK),
         hasamiShogi.WHITE: make_engine(white_arg, hasamiShogi.WHITE)
@@ -106,6 +137,13 @@ def run_arena(black_arg, white_arg, max_moves=500):
         print("")
         print("")
         print(arena.serialize())
+        draw_board(screen, arena.board)
+
+        for evt in pygame.event.get():
+            if evt.type == pygame.QUIT:
+                pygame.quit()
+                return
+        time.sleep(DELAY)
 
         eng = engines[arena.turn]
         eng.send(f"{arena.last_move[0]}{arena.last_move[1]}{arena.last_move[2]}{arena.last_move[3]}")
@@ -140,6 +178,8 @@ def run_arena(black_arg, white_arg, max_moves=500):
         eng.close()
 
     print("Result:", winner or "DRAW")
+    with open("history.pkl", "wb") as f:
+        pickle.dump(arena.history, f)
     return winner
 
 if __name__=="__main__":
