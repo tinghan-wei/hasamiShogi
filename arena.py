@@ -8,11 +8,11 @@ import time
 CELL_SIZE = 60
 DELAY = 0.3     # seconds
 
-def init_display(board_size):
+def init_display(nameB, nameW):
     pygame.init()
     size = hasamiShogi.BOARD_SIZE * CELL_SIZE
     screen = pygame.display.set_mode((size, size))
-    pygame.display.set_caption("Hasami Shogi Match")
+    pygame.display.set_caption(f"{nameB} (B) vs {nameW} (W)")
     return screen
 
 def draw_board(screen, board):
@@ -107,7 +107,6 @@ def parse_moves(s):
 def run_arena(black_arg, white_arg, max_moves=500):
     global arena
     arena = hasamiShogi.HasamiShogi()
-    screen = init_display(hasamiShogi.BOARD_SIZE)
 
     engines = {
         hasamiShogi.BLACK: make_engine(black_arg, hasamiShogi.BLACK),
@@ -124,6 +123,7 @@ def run_arena(black_arg, white_arg, max_moves=500):
                 eng.send("Black")
                 try:
                     firstMv = eng.recv()
+                    nameB = eng.name
                     r1, c1, r2, c2 = parse_moves(firstMv)
                     arena.apply_move(r1,c1,r2,c2, hasamiShogi.BLACK)
                     break
@@ -132,6 +132,9 @@ def run_arena(black_arg, white_arg, max_moves=500):
             
         elif color == hasamiShogi.WHITE:
             eng.send("White")
+            nameW = eng.name
+    
+    screen = init_display(nameB, nameW)
 
     for move_num in range(1, max_moves+1):
         print("")
