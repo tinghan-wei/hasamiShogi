@@ -15,6 +15,7 @@ class HasamiShogi:
         # pending victory condition state
         self.pending_leader = None
         self.turn = BLACK
+        self.history = []
 
     def set_board(self, board_list):
         """
@@ -196,6 +197,8 @@ class HasamiShogi:
         # record last mover
         self.last_move = (r1,c1,r2,c2)
         self.turn = opp
+
+        self.history.append(self.last_move)
 
     def is_game_over(self):
         # player to play next
