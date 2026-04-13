@@ -6,21 +6,24 @@ import pygame
 import time
 
 CELL_SIZE = 60
+MARGIN = 40
 DELAY = 0.3     # seconds
 
 def init_display(nameB, nameW):
     pygame.init()
-    size = hasamiShogi.BOARD_SIZE * CELL_SIZE
+    size = hasamiShogi.BOARD_SIZE * CELL_SIZE + 2 * MARGIN
     screen = pygame.display.set_mode((size, size))
     pygame.display.set_caption(f"{nameB} (B) vs {nameW} (W)")
     return screen
 
 def draw_board(screen, board):
     screen.fill((200,200,200))
+    
+    # Draw board cells
     for r in range(len(board)):
         for c in range(len(board)):
-            x, y = c*CELL_SIZE, r*CELL_SIZE
-            rect = pygame.Rect(x,y,CELL_SIZE,CELL_SIZE)
+            x, y = MARGIN + c*CELL_SIZE, MARGIN + r*CELL_SIZE
+            rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(screen, (255,255,255), rect)
             pygame.draw.rect(screen, (0,0,0), rect, 1)
             p = board[r][c]
@@ -29,6 +32,34 @@ def draw_board(screen, board):
             elif p == hasamiShogi.WHITE:
                 pygame.draw.circle(screen, (255,255,255), rect.center, CELL_SIZE//2-5)
                 pygame.draw.circle(screen, (0,0,0), rect.center, CELL_SIZE//2-5, 2)
+    
+    # Draw coordinate labels
+    font = pygame.font.Font(None, 24)
+    
+    # Column labels (0-8)
+    for c in range(len(board)):
+        x = MARGIN + c*CELL_SIZE + CELL_SIZE//2
+        # Top
+        text = font.render(str(c), True, (0,0,0))
+        text_rect = text.get_rect(center=(x, MARGIN//2))
+        screen.blit(text, text_rect)
+        # Bottom
+        text = font.render(str(c), True, (0,0,0))
+        text_rect = text.get_rect(center=(x, MARGIN + len(board)*CELL_SIZE + MARGIN//2))
+        screen.blit(text, text_rect)
+    
+    # Row labels (0-8)
+    for r in range(len(board)):
+        y = MARGIN + r*CELL_SIZE + CELL_SIZE//2
+        # Left
+        text = font.render(str(r), True, (0,0,0))
+        text_rect = text.get_rect(center=(MARGIN//2, y))
+        screen.blit(text, text_rect)
+        # Right
+        text = font.render(str(r), True, (0,0,0))
+        text_rect = text.get_rect(center=(MARGIN + len(board)*CELL_SIZE + MARGIN//2, y))
+        screen.blit(text, text_rect)
+    
     pygame.display.flip()
 
 class Engine:
