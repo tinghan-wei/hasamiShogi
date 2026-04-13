@@ -24,7 +24,7 @@ def main():
     if not line.startswith("OK"):
         print("Expected 'OK?' line", file=sys.stderr)
         return
-    print("Random")
+    print("Random", flush=True)
 
     line = sys.stdin.readline().strip()
     my_color = line[0].upper()
@@ -40,12 +40,12 @@ def main():
         if not skip_input:
             line = sys.stdin.readline().strip()
             
+            if line.startswith("GAME_OVER"):
+                break
+            
             r1,c1,r2,c2 = parse_moves(line)
             engine.apply_move(r1, c1, r2, c2, opp)
 
-        if line.startswith("GAME_OVER"):
-            break
-        
         legal = engine.generate_legal_moves(my_color)
         r1, c1, r2, c2 = random.choice(legal)
         engine.apply_move(r1, c1, r2, c2, my_color)
