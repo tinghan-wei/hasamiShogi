@@ -19,7 +19,8 @@ Hasami Shogi is played on a 9×9 board with:
 - White pieces starting on the bottom row (row 8)
 - Players alternate turns moving pieces horizontally or vertically
 - Pieces are captured when surrounded on opposite sides by opponent pieces
-- The game ends when a player's king (leader) is captured or can no longer move
+- When one player has at least three more pieces than their opponent, the opponent has one more turn to reduce the gap to within three pieces. If the opponent is unable to do so, the opponent loses the game.
+- Alternatively, whichever player has five or more pieces than their opponent wins immediately.
 
 ## Project Structure
 
@@ -27,21 +28,20 @@ Hasami Shogi is played on a 9×9 board with:
 .
 ├── hasamiShogi.py          # Core game engine
 ├── arena.py                # Tournament arena for player matches
-├── visualize.py            # Game visualization with Pygame
+├── visualize.py            # Game visualization using play records
 ├── hasamiTest.py           # Unit tests
 ├── randomPlayer.py         # Simple random move player
-├── Shimizu.py             # Example AI player
-└── players/               # Directory of AI player implementations
+└── players/                # Directory of AI player implementations
     ├── Itoh.py
     ├── Tanimoto.py
     ├── Yamada.py
     ├── Shimizu.py
-    └── Kumon Yoshikazu/   # C/C++ optimized implementation
+    └── Kumon/   # C/C++
         ├── alphabeta.c
         ├── alphabeta.h
         ├── my_ai.c
         └── shogi.c
-    └── Matsumoto Shotaro/ # C++ advanced implementation
+    └── Matsumoto/ # C++
         ├── app/           # Source files
         └── include/       # Header files
 ```
@@ -52,7 +52,7 @@ Hasami Shogi is played on a 9×9 board with:
 
 - **hasamiShogi.py**: Game engine implementing board state, move generation, move validation, and victory conditions
 - **arena.py**: Tournament system that orchestrates matches between players with visualization
-- **visualize.py**: Pygame-based GUI for watching games in real-time
+- **visualize.py**: Pygame-based GUI for watching games from records
 
 ### Testing
 
@@ -90,22 +90,11 @@ python arena.py <player1_module> <player2_module>
 
 Example:
 ```bash
-python arena.py randomPlayer randomPlayer
-python arena.py players.Itoh players.Tanimoto
+python arena.py "python randomPlayer.py" "python randomPlayer.py"
+python arena.py "python players/Itoh.py" "python players/Tanimoto.py"
 ```
-
-### Visualize a Game
-
-Games played through the arena are automatically visualized using Pygame when available.
 
 ### Run Tests
-
-```bash
-python -m pytest hasamiTest.py
-```
-
-or
-
 ```bash
 python hasamiTest.py
 ```
@@ -116,56 +105,7 @@ Players interact with the arena through stdin/stdout using this protocol:
 
 1. Arena sends: `OK?`
 2. Player responds with: `<PlayerName>`
-3. Arena sends: `<Color>` (B for Black, W for White)
+3. Arena sends: `<Color>` (Black or White)
 4. Player receives moves as 4-digit strings: `r1c1r2c2` (from row-col to row-col)
 5. Player outputs moves in same format
 6. Game ends with: `GAME_OVER <Winner>`
-
-## AI Implementation Examples
-
-### Random Player
-
-The simplest approach - generates all legal moves and picks one at random.
-
-### Minimax with Alpha-Beta Pruning
-
-More sophisticated implementations use minimax algorithm with alpha-beta pruning to evaluate moves several plies deep.
-
-### Optimization Strategies
-
-Some players implement:
-- Orthogonal/diagonal move strategies
-- Enhanced heuristic evaluations
-- C/C++ implementations for performance
-
-## Development
-
-### Adding New AI Players
-
-1. Create a new Python module in the `players/` directory
-2. Implement move generation and selection logic
-3. Follow the stdin/stdout communication protocol
-4. Test against existing players using the arena
-
-### Extending the Game Engine
-
-The core game logic in `hasamiShogi.py` can be extended with:
-- Move history tracking
-- Performance statistics
-- Additional validation rules
-- Custom board initialization
-
-## License
-
-This project is developed for educational purposes at Kochi University of Technology and Kochi Prefecture University.
-
-## Contributors
-
-- Multiple student implementations in `players/` directory
-- Game engine and arena framework
-
-## Notes
-
-- Tournament histories are saved in `history.pkl`
-- Games can be replayed and analyzed from saved histories
-- The `.dist/` directory is used for build artifacts
