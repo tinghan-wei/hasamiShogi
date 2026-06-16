@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Submit Player – Hasami Shogi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <h2 class="mb-4">Submit Your Player</h2>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Player name</label>
+            <input type="text" name="name" class="form-control"
+                   placeholder="e.g. Yamada or Yamada_v2"
+                   pattern="[A-Za-z0-9_]{1,32}" maxlength="32" required>
+            <div class="form-text">
+              1–32 characters: letters, digits, underscores.
+              Submitting with the <em>same name</em> replaces your current entry.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Python script (.py)</label>
+            <input type="file" name="file" class="form-control" accept=".py" required>
+            <div class="form-text">Max 100 KB.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Upload &amp; Play
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {# ── Protocol reference ──────────────────────────────────────────────── #}
+    <div class="accordion" id="protocolAccordion">
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#protocol">
+            Player protocol (stdin / stdout)
+          </button>
+        </h2>
+        <div id="protocol" class="accordion-collapse collapse"
+             data-bs-parent="#protocolAccordion">
+          <div class="accordion-body small">
+            <ol class="mb-3">
+              <li>Read one line: <code>OK?</code> → print your player name, flush.</li>
+              <li>Read one line: <code>Black</code> or <code>White</code>.
+                <ul>
+                  <li>If <strong>Black</strong>: immediately print your first move (4 digits, e.g. <code>0102</code>) and flush.</li>
+                  <li>If <strong>White</strong>: wait for step 3.</li>
+                </ul>
+              </li>
+              <li>Loop:
+                <ul>
+                  <li>Read one line: the opponent's last move (4 digits) <em>or</em> <code>GAME_OVER WIN/LOSS/DRAW</code>.</li>
+                  <li>If <code>GAME_OVER</code>: exit.</li>
+                  <li>Otherwise: apply the move to your internal board, choose your move, print it, flush.</li>
+                </ul>
+              </li>
+            </ol>
+            <p class="mb-1">Move format: <code>r1c1r2c2</code> (row/col of piece to move, row/col of destination). Rows and columns are 0–8.</p>
+            <p class="mb-0">See <code>randomPlayer.py</code> in the repository for a minimal working example.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#imports">
+            Allowed imports
+          </button>
+        </h2>
+        <div id="imports" class="accordion-collapse collapse"
+             data-bs-parent="#protocolAccordion">
+          <div class="accordion-body small">
+            <p class="mb-2">Standard library modules that are safe to use:</p>
+            <code>hasamiShogi, sys, random, copy, math, collections,
+heapq, itertools, functools, typing, abc, time, re, json</code>
+            <p class="mt-3 mb-0 text-danger">
+              Network access (<code>socket</code>, <code>urllib</code>, …),
+              file I/O (<code>open</code>, <code>os</code>, <code>pathlib</code>, …),
+              subprocesses, dynamic code (<code>exec</code>, <code>eval</code>),
+              and <code>ctypes</code> are blocked and will cause your upload to be rejected.
+              Players run in an isolated Docker container with no network and a read-only filesystem.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>{# /accordion #}
+  </div>
+</div>
+{% endblock %}

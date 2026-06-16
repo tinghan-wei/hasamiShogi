@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Leaderboard – Hasami Shogi Tournament{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h2 class="mb-0">Leaderboard</h2>
+  <div class="d-flex gap-2">
+    <a href="/upload" class="btn btn-primary btn-sm">Submit Player</a>
+    <form action="/run-tournament" method="post" class="d-inline">
+      <button class="btn btn-outline-secondary btn-sm"
+              onclick="return confirm('Run a full round-robin now?')">
+        Run Tournament Now
+      </button>
+    </form>
+  </div>
+</div>
+
+{# ── Stats row ──────────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card h-100 text-center">
+      <div class="card-body d-flex flex-column justify-content-center py-3">
+        <div class="stat-value">{{ rankings | length }}</div>
+        <small class="text-muted">Players</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100 text-center">
+      <div class="card-body d-flex flex-column justify-content-center py-3">
+        <div class="stat-value">{{ total_games }}</div>
+        <small class="text-muted">Games played</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100 text-center">
+      <div class="card-body d-flex flex-column justify-content-center py-3">
+        <div class="stat-value" style="font-size:1.1rem">
+          {{ last_tournament[:16] if last_tournament else '—' }}
+        </div>
+        <small class="text-muted">Last tournament</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100 text-center">
+      <div class="card-body d-flex flex-column justify-content-center py-3">
+        <div class="stat-value" style="font-size:1.1rem">
+          {{ next_run.strftime('%b %d %H:%M') if next_run else '—' }}
+        </div>
+        <small class="text-muted">Next tournament</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Rankings table ─────────────────────────────────────────────────────── #}
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th style="width:3rem">#</th>
+          <th>Player</th>
+          <th class="text-end">Pts</th>
+          <th class="text-end">W</th>
+          <th class="text-end">D</th>
+          <th class="text-end">L</th>
+          <th class="text-end">Games</th>
+          <th class="text-end d-none d-sm-table-cell">Win %</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rankings %}
+        <tr>
+          <td>
+            {% if loop.index == 1 %}<span class="rank-gold">1</span>
+            {% elif loop.index == 2 %}<span class="rank-silver">2</span>
+            {% elif loop.index == 3 %}<span class="rank-bronze">3</span>
+            {% else %}{{ loop.index }}{% endif %}
+          </td>
+          <td>
+            <a href="/player/{{ r.id }}" class="text-decoration-none fw-semibold">
+              {{ r.name }}
+            </a>
+          </td>
+          <td class="text-end fw-bold">{{ r.points }}</td>
+          <td class="text-end result-win">{{ r.wins }}</td>
+          <td class="text-end result-draw">{{ r.draws }}</td>
+          <td class="text-end result-loss">{{ r.losses }}</td>
+          <td class="text-end">{{ r.games }}</td>
+          <td class="text-end d-none d-sm-table-cell">
+            {% if r.games > 0 %}{{ r.win_pct }}%{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center text-muted py-5">
+            No players yet.
+            <a href="/upload">Submit the first one!</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="text-muted mt-3 small">
+  Scoring: Win = 2 pts, Draw = 1 pt, Loss = 0 pts.
+  Each pair plays twice (colour swap). Rankings update after every tournament.
+</p>
+{% endblock %}
