@@ -1,0 +1,13 @@
+[project]
+name = "hasami-shogi-platform"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.0",
+    "apscheduler>=3.10",
+]
+
+[project.optional-dependencies]
+prod = [
+    "gunicorn>=22.0",
+]
