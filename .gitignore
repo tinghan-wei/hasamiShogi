@@ -213,3 +213,7 @@ tasks.json
 *.ilk
 *.pdb
 *.exe
+
+# Platform
+platform/tournament.db
+platform/players/*.py
